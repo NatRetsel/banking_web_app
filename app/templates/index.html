@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Hello, {{user.username}}</h1>
+    <h2>Account Balance: ${{balance}}</h2>
     <h2>Recent Transactions</h2>
     {% for transaction in transactions %}
     <div>

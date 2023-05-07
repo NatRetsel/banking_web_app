@@ -23,4 +23,4 @@ def index():
             'Amount': 1
         }
     ]
-    return render_template('index.html', title='Home', user=user, transactions=transactions)
+    return render_template('index.html', title='Home', user=user, balance=account_balance, transactions=transactions)
