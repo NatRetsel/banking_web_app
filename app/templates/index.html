@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Hello, {{user.username}}</h1>
+    <h2>Recent Transactions</h2>
+    {% for transaction in transactions %}
+    <div>
+        <pre>
+            {{transaction.Date}}
+            {{transaction.From}} to {{transaction.To}} - {{transaction.Amount}}
+        </pre>
+    </div>
+    {% endfor %}
+{% endblock %}
