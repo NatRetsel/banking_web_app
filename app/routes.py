@@ -1,10 +1,10 @@
 from flask import render_template, redirect, url_for, flash, session, request
 from flask_login import current_user, login_user, logout_user
 from app.forms import RegistrationForm, LoginForm
-from app.models import User
+from app.models import User, Role
 from app import app, db
 from werkzeug.urls import url_parse
-#Contains the different URLs of the bank webapp
+
 
 @app.route('/')
 @app.route('/index')
@@ -18,7 +18,8 @@ def register():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data)
+        user_role = Role.query.filter_by(name='User').first()
+        user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data, role_id=user_role.id) # Defaults role to user role 
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

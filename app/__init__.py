@@ -1,5 +1,5 @@
 import os
-from config import Config
+from config import config
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask_bootstrap import Bootstrap
@@ -10,7 +10,7 @@ from flask_login import LoginManager
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config.from_object(config['production'])
 bootstrap = Bootstrap(app)
 moment = Moment(app)
 login = LoginManager(app)
