@@ -21,7 +21,7 @@ A personal banking web app supporting user creation, login and showing recent tr
 - data.sqlite
 - requirements.txt
 
-###To run: 
+### To run: 
 - pip install -r requirements.txt in virtual environment
 - Change configuration settings in app/__init__.py:
   - Development: 'development'
