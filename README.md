@@ -77,7 +77,9 @@ A personal banking web app supporting user creation, login and showing recent tr
   - if configuration == config['testing']
   - default role id is "user" upon new registration
 
-#### 3.) Email support with Flask-Mail
+#### 3.) Refactor with application factory and blueprint
 
-#### 4.) User Transaction details
+#### 4.) Email support with Flask-Mail
+
+#### 5.) User Transaction details
 
