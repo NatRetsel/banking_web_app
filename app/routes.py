@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, session, request
+from flask import render_template, redirect, url_for, flash, session, request, Response
 from flask_login import current_user, login_user, logout_user
 from app.forms import RegistrationForm, LoginForm
 from app.models import User, Role
@@ -8,12 +8,12 @@ from werkzeug.urls import url_parse
 
 @app.route('/')
 @app.route('/index')
-def index():
+def index() -> Response:
     first_name = session.get('first_name')
     return render_template('index.html', first_name=first_name)
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def register() -> Response:
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
@@ -28,7 +28,7 @@ def register():
     return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login() -> Response:
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = LoginForm()
@@ -45,6 +45,6 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
-def logout():
+def logout() -> Response:
     logout_user()
     return redirect(url_for('index'))

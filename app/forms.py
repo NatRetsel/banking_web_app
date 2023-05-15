@@ -1,3 +1,4 @@
+from typing import Optional
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, BooleanField, EmailField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
@@ -12,8 +13,8 @@ class RegistrationForm(FlaskForm):
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Submit')
     
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+    def validate_email(self, email: str) -> None:
+        user: Optional[str] = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
