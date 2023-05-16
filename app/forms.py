@@ -5,6 +5,20 @@ from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User
 
 class RegistrationForm(FlaskForm):
+    """User registration form 
+        - User account registration. Login ID will be the email address
+        - Inherits FlaskForm object
+        - Fields:
+            - first_name (str): User first name
+            - last_name (str): User last name
+            - email (str): User email
+            - password (str): User password
+            - password (str): User password repeat
+            - submit ('POST')
+
+    Raises:
+        ValidationError: when an email is already present in the database
+    """
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
     email = EmailField('Email',validators=[DataRequired(), Email()] )
@@ -20,6 +34,16 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
+    """User login form
+        - User account registration. Login ID will be the email address
+        - Inherits FlaskForm object
+        - Fields:
+            - email (str): User email
+            - password (str): User password
+            - remember_me (bool): Fed into flask-login's user_login function dealing with session management
+            - submit ('POST')
+
+    """
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
