@@ -1,7 +1,7 @@
 # Banking web app
 ## A basic personal banking web app
 
-A personal banking web app supporting user creation, login and showing recent transactions and account balance. Backend written in Flask and SQLite database with Alembic migration support. Frontend written in html and Flask bootstrap.
+A personal banking web app supporting user creation, login and showing recent transactions and account balance. Backend written in Flask and SQLite database with Alembic migration support. Frontend written in html and Flask bootstrap. A detailed walkthrough can be found in my medium articles [part one](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-1-8fcc69b80ab2).
 
 ### Folder Contents
 - app 
