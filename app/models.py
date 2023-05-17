@@ -31,8 +31,7 @@ class User(UserMixin, db.Model):
             - email (SQLite str120): user email
             - password_hash (SQLite str128): user hashed password
             - role_id (SQLite int): user's role, mapped to Role table
-            - balance (SQLite bigint): user account balance
-            - txns (SQLite bigint): transactions id involving user, mapped to Transactions table
+            
 
     """
     
@@ -44,8 +43,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles_table.id'))
-    balance = db.Column(db.BigInteger)
-    txns = db.Column(db.BigInteger, db.ForeignKey('transactions_table.id'))
     
     def set_password(self, password: str) -> None:
         """Stores user's password as a hashed value
@@ -76,19 +73,40 @@ class Transactions(db.Model):
 
     Columns:
         - id (SQLite bigint): primary key
-        - txn_to (SQLite str64): first name + last name of receiver (may / may not exist in local bank database)
-        - txn_from (SQLite str64): first name + last name of sender (may / may not exist in local bank database)
+        - receiver (SQLite bigint): account number of receiver
+        - sender (SQLite bigint): account number of sender
         - amount (SQLite bigint): amount involved in the transaction
-
+        - date_time (SQLite DateTime): date time of the transaction
     
     """
     
     __tablename__ = "transactions_table"
     
     id = db.Column(db.BigInteger, primary_key=True)
-    txn_to = db.Column(db.String(64), index=True)
-    txn_from = db.Column(db.String(64), index=True)
+    receiver = db.Column(db.BigInteger)
+    sender = db.Column(db.BigInteger)
     amount = db.Column(db.BigInteger)
+    date_time = db.Column(db.DateTime, index=True)
     
     def __repr__(self):
-        return '<Txn {}: {} - {}, {}>'.format(self.id, self.txn_to, self.txn_from, self.amount)
+        return '< {} Txn {}: {} - {}, {}>'.format(self.date_time, self.id, self.sender, self.receiver, self.amount)
+
+
+class Accounts(db.Model):
+    """Bank account SQlite ORM model
+
+    Columns:
+        id (SQLite bigint): account id
+        account_num (SQLite bigint): bank account number
+        owner (SQLite int): bank account owner, mapped to users_table id
+        balance (SQLite bigint): account balance
+    """
+    
+    __tablename__ = "accounts_table"
+    
+    account_num = db.Column(db.BigInteger, db.ForeignKey('transactions_table.receiver'), db.ForeignKey('transactions_table.sender'), primary_key=True)
+    owner = db.Column(db.Integer, db.ForeignKey('users_table.id'))
+    balance = db.Column(db.BigInteger)
+    
+    def __repr__(self):
+        return '<{} account {}: {}, {}>'.format(self.owner, self.account_num, self.balance)
