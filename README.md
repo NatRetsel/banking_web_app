@@ -5,6 +5,7 @@ A personal banking web app supporting user creation, login and showing recent tr
 
 - [part one](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-1-8fcc69b80ab2)
 - [part two](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-2-e11ebb4d1703)
+- [part three](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-3-f116e6fa881b)
 
 ### Folder Contents
 - app 
