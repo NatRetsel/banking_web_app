@@ -4,18 +4,31 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
-from flask_migrate import Migrate
 from flask_login import LoginManager
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-app = Flask(__name__)
-app.config.from_object(config['production'])
-bootstrap = Bootstrap(app)
-moment = Moment(app)
-login = LoginManager(app)
+
+bootstrap = Bootstrap()
+moment = Moment()
+login = LoginManager()
 login.login_view = 'login'
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-from app import routes
+db = SQLAlchemy()
+
+
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    
+    bootstrap.init_app(app)
+    moment.init_app(app)
+    db.init_app(app)
+    login.init_app(app)
+    
+    
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+    
+    return app
+    
