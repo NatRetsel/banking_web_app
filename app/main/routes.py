@@ -16,7 +16,7 @@ def index() -> Response:
 @main.route('/register', methods=['GET', 'POST'])
 def register() -> Response:
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user_role = Role.query.filter_by(name='User').first()
@@ -26,6 +26,8 @@ def register() -> Response:
         db.session.commit()
         flash('Congratulations, you are now a registered user! Please login')
         return redirect(url_for('.login'))
+    else:
+        flash('Please enter valid fields')
     return render_template('register.html', form=form)
 
 @main.route('/login', methods=['GET', 'POST'])
