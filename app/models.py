@@ -44,6 +44,10 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles_table.id'))
     
+    @property
+    def pasword(self):
+        raise AttributeError('password is not a readable attribute')
+    
     def set_password(self, password: str) -> None:
         """Stores user's password as a hashed value
             Reduces risk of compromising user information safety if we store password hash instead.
