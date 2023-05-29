@@ -13,8 +13,7 @@ def register() -> Response:
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user_role = Role.query.filter_by(name='User').first()
-        user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data, role_id=user_role.id) # Defaults role to user role 
+        user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data) # Defaults role to user role 
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
