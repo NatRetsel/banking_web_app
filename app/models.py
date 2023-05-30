@@ -17,8 +17,24 @@ class Role(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
     users = db.relationship('User', backref='role') # Adds role attribute to User model
     
+    def __init__(self, **kwargs):
+        super(Role, self).__init__(**kwargs)
+    
+    @staticmethod
+    def insert_roles():
+        roles = {'Administrator', 'Moderator', 'User'}
+        default_role = 'User'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.default = (role.name == default_role)
+            db.session.add(role)
+        db.session.commit()
+        
     def __repr__(self):
         return '<Role %r>' % self.name
 
@@ -43,6 +59,15 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles_table.id'))
+    
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            self.role = Role.query.filter_by(default=True).first()
+    
+    @property
+    def pasword(self):
+        raise AttributeError('password is not a readable attribute')
     
     def set_password(self, password: str) -> None:
         """Stores user's password as a hashed value
