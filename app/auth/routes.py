@@ -9,6 +9,14 @@ from werkzeug.urls import url_parse
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register() -> Response:
+    """User registration route
+    1.) If user is logged in, redirects to index page
+    2.) Upon validating registration form, stores user password hash, creates a User model and pushes into database. Then redirects to login
+    3.) If form validation fails, redirects back to register page.
+
+    Returns:
+        Response: login page if registration is successful else register page. If user is logged in then redirects to index.
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = RegistrationForm()
@@ -21,8 +29,20 @@ def register() -> Response:
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
 
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login() -> Response:
+    """User login route
+    1.) If user is already logged in, redirects to index route
+    2.) If login form is validated:
+        (i) if user exists and password matches
+            - redirects to previous viewed page if it exists else index page
+        (ii) if user does not exist or password is wrong
+            - flask error message and redirects to login page
+
+    Returns:
+        Response: _description_
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = LoginForm()
@@ -38,7 +58,13 @@ def login() -> Response:
         return redirect(next_page)
     return render_template('auth/login.html', title='Sign In', form=form)
 
+
 @auth.route('/logout')
 def logout() -> Response:
+    """User log out route
+    Logs user out using logout_user() function in Flask-Login extension
+    Returns:
+        Response: index page
+    """
     logout_user()
     return redirect(url_for('main.index'))

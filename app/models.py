@@ -11,6 +11,7 @@ class Role(db.Model):
         Columns:
             - id (SQLite int): primary key
             - name (SQLite str64): role name in system (e.g. Admin, Moderator, User)
+            - default (SQLite bool): Only one role is marked True (User)
         
     """
     __tablename__ = "roles_table"
@@ -24,7 +25,8 @@ class Role(db.Model):
         super(Role, self).__init__(**kwargs)
     
     @staticmethod
-    def insert_roles():
+    def insert_roles()->None:
+        # Static method to push roles into database.
         roles = {'Administrator', 'Moderator', 'User'}
         default_role = 'User'
         for r in roles:
