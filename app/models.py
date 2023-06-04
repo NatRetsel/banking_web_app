@@ -131,9 +131,19 @@ class Accounts(db.Model):
     
     __tablename__ = "accounts_table"
     
-    account_num = db.Column(db.BigInteger, db.ForeignKey('transactions_table.receiver'), db.ForeignKey('transactions_table.sender'), primary_key=True)
+    account_num = db.Column(db.Integer, db.ForeignKey('transactions_table.receiver'), db.ForeignKey('transactions_table.sender'), primary_key=True, autoincrement=True)
     owner = db.Column(db.Integer, db.ForeignKey('users_table.id'))
-    balance = db.Column(db.BigInteger)
+    balance = db.Column(db.BigInteger, default=0)
+    
+    def new_account(self):
+        """
+        Sets balance of fresh account to 0
+        """
+        if not self.balance:
+            self.balance = 0
+    
+    def update_balance(self, amount):
+        self.balance += amount
     
     def __repr__(self):
-        return '<{} account {}: {}, {}>'.format(self.owner, self.account_num, self.balance)
+        return '<Account no. {}, owner {}: {}>'.format(self.owner, self.account_num, self.balance)

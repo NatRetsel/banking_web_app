@@ -1,7 +1,8 @@
 from flask import render_template, redirect, url_for, flash, request, Response
-from flask_login import current_user, login_user, logout_user
-from ..main.forms import RegistrationForm, LoginForm
-from app.models import User, Role
+from flask_login import current_user, login_user, logout_user, login_required
+from ..main.forms import RegistrationForm, LoginForm, TransferForm
+from app.models import User, Role, Accounts, Transactions
+from datetime import datetime
 from .. import db
 from . import auth
 from werkzeug.urls import url_parse
@@ -24,6 +25,11 @@ def register() -> Response:
         user = User(first_name=form.first_name.data, last_name=form.last_name.data, email=form.email.data) # Defaults role to user role 
         user.set_password(form.password.data)
         db.session.add(user)
+        db.session.commit()
+        
+        user_id = User.query.filter_by(email=form.email.data).first().id
+        user_acc = Accounts(owner=user_id)
+        db.session.add(user_acc)
         db.session.commit()
         flash('Congratulations, you are now a registered user! Please login')
         return redirect(url_for('auth.login'))
@@ -60,6 +66,7 @@ def login() -> Response:
 
 
 @auth.route('/logout')
+@login_required
 def logout() -> Response:
     """User log out route
     Logs user out using logout_user() function in Flask-Login extension
@@ -68,3 +75,28 @@ def logout() -> Response:
     """
     logout_user()
     return redirect(url_for('main.index'))
+
+
+@auth.route('/transfer')
+@login_required
+def transfer() -> Response:
+    """Sending money from own balance to other accounts in the same database
+
+    Returns:
+        Response: index page
+    """
+    form = TransferForm()
+    if form.validate_on_submit():
+        recipient_acc = Accounts.query.filter_by(account_num=form.recipient_acc_num.data).first()
+        recipient_acc_num = recipient_acc.account_num
+        sender_id = User.query.filter_by(email=current_user.email).first()
+        sender_acc = Accounts.query.filter_by(ownder=sender_id).first()
+        sender_acc_num = sender_acc.account_num
+        recipient_acc.update_balance(form.amount.data)
+        sender_acc.update_balance(-form.amount.data)
+        
+        txn = Transactions(recipient_acc_num, sender_acc_num, form.amount.data, datetime.utcnow())
+        db.session.add_all([recipient_acc, sender_acc, txn])
+        db.session.commit()
+        return redirect(url_for('main.index'))
+    return render_template('auth/transfer.html', title='Funds Transfer', form=form)

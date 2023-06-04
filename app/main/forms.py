@@ -1,6 +1,6 @@
 from typing import Optional
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, BooleanField, EmailField
+from wtforms import StringField, SubmitField, PasswordField, BooleanField, EmailField, DecimalField, IntegerField
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
 from app.models import User
 
@@ -48,3 +48,14 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+
+class TransferForm(FlaskForm):
+    """Transfer funds form
+        - User fund transfer. Login is required to access the form
+        - User inputs recipient account number and desired transfer amount
+    
+    """
+    recipient_acc_num = IntegerField('To Account', validators=[DataRequired()])
+    amount = DecimalField('Amount', validators=[DataRequired()])
+    submit = SubmitField('Send')
