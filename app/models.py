@@ -1,6 +1,7 @@
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from . import login
 
 @login.user_loader
 def load_user(id):
@@ -39,6 +40,7 @@ class Role(db.Model):
         
     def __repr__(self):
         return '<Role %r>' % self.name
+
 
 class User(UserMixin, db.Model):
     """User SQlite ORM model
@@ -95,6 +97,38 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {} {}>'.format(self.first_name, self.last_name)
 
+
+class TransactionType(db.Model):
+    """Transaction Type SQlite ORM model
+        Columns:
+            - id (SQLite int): primary key
+            - name (SQLite str64): transaction type in system (e.g. Deposit, Withdrawal, Transfer, Other)
+        
+    """
+    __tablename__ = "transaction_type_table"
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
+    txn = db.relationship('Transactions', backref='transaction_type') # Adds txn attribute to Transactions model
+    
+    def __init__(self, **kwargs):
+        super(TransactionType, self).__init__(**kwargs)
+    
+    @staticmethod
+    def insert_transaction_types()->None:
+        # Static method to push roles into database.
+        transaction_types = {'Deposit', 'Withdrawal', 'Transfer', 'New Account', 'Other'}
+        for type in transaction_types:
+            transaction_type = TransactionType.query.filter_by(name=type).first()
+            if transaction_type is None:
+                transaction_type = TransactionType(name=type)
+            db.session.add(transaction_type)
+        db.session.commit()
+        
+    def __repr__(self):
+        return '<Transaction Types %r>' % self.name
+
+
 class Transactions(db.Model):
     """Transactions SQlite ORM model
 
@@ -109,14 +143,15 @@ class Transactions(db.Model):
     
     __tablename__ = "transactions_table"
     
-    id = db.Column(db.BigInteger, primary_key=True)
-    receiver = db.Column(db.BigInteger)
-    sender = db.Column(db.BigInteger)
-    amount = db.Column(db.BigInteger)
+    id = db.Column(db.Integer, primary_key=True)
+    receiver = db.Column(db.Integer)
+    sender = db.Column(db.Integer)
+    amount = db.Column(db.Integer)
     date_time = db.Column(db.DateTime, index=True)
+    transaction_type_id = db.Column(db.Integer, db.ForeignKey('transaction_type_table.id'))
     
     def __repr__(self):
-        return '< {} Txn {}: {} - {}, {}>'.format(self.date_time, self.id, self.sender, self.receiver, self.amount)
+        return '< {} Txn {}: {} - {}, amount {}, type: {}>'.format(self.date_time, self.id, self.sender, self.receiver, self.amount, self.transaction_type_id)
 
 
 class Accounts(db.Model):
@@ -133,7 +168,7 @@ class Accounts(db.Model):
     
     account_num = db.Column(db.Integer, db.ForeignKey('transactions_table.receiver'), db.ForeignKey('transactions_table.sender'), primary_key=True, autoincrement=True)
     owner = db.Column(db.Integer, db.ForeignKey('users_table.id'))
-    balance = db.Column(db.BigInteger, default=0)
+    balance = db.Column(db.Float, default=0.00)
     
     def new_account(self):
         """

@@ -1,7 +1,7 @@
 from typing import Optional
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, BooleanField, EmailField, DecimalField, IntegerField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from wtforms import StringField, SubmitField, PasswordField, BooleanField, EmailField, DecimalField, IntegerField, FloatField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, NumberRange
 from app.models import User
 
 class RegistrationForm(FlaskForm):
@@ -57,5 +57,17 @@ class TransferForm(FlaskForm):
     
     """
     recipient_acc_num = IntegerField('To Account', validators=[DataRequired()])
-    amount = DecimalField('Amount', validators=[DataRequired()])
+    amount = FloatField('Amount', validators=[DataRequired(), NumberRange(min=0.01)])
     submit = SubmitField('Send')
+    
+
+class DepositForm(FlaskForm):
+    """User Deposit funds form
+        - For the purposes of this application, this form mimics cash deposits 
+        - User inputs the amount after logging in, to which the amount is added to the balance
+        - A deposit transaction is also added
+
+    """
+    amount = FloatField('Amount', validators=[DataRequired(), NumberRange(min=0.01)])
+    submit = SubmitField('Send')
+    

@@ -1,4 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Hello {{current_user.first_name}}</h1>
+    {% if current_user.is_authenticated %}
+        <div>Balance: {{ balance }} </div>
+    {% endif %}
+    <ul class="transactions">
+        {% for transaction in transactions %}
+        <li class="transaction">
+            <div class="transaction-date">Date: {{transaction.date_time}}</div>
+            <div class="transaction-parties">From: {{transaction.sender}} To: {{transaction.receiver}} Type: {{transaction.transaction_type_id}}</div>
+            <div class="transaction-amount">Amount: {{transaction.amount}}</div>
+        </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
