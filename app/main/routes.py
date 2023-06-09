@@ -15,10 +15,11 @@ def index() -> Response:
     balance = None
     first_name = session.get('first_name')
     transactions = []
+    account = None
     if current_user.is_authenticated:
         user = User.query.filter_by(email=current_user.email).first()
         account = Accounts.query.filter_by(owner=user.id).first()
         balance = account.balance
         transactions = Transactions.query.filter((Transactions.receiver_account == account) | 
                                                  (Transactions.sender_account == account)).order_by(Transactions.date_time.desc()).all()
-    return render_template('index.html', first_name=first_name, balance=balance, transactions=transactions)
+    return render_template('index.html', first_name=first_name, balance=balance, account=account, transactions=transactions)

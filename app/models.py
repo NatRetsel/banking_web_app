@@ -159,7 +159,6 @@ class Accounts(db.Model):
     """Bank account SQlite ORM model
 
     Columns:
-        id (SQLite bigint): account id
         account_num (SQLite bigint): bank account number
         owner (SQLite int): bank account owner, mapped to users_table id
         balance (SQLite bigint): account balance
