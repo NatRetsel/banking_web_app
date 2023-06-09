@@ -19,6 +19,6 @@ def index() -> Response:
         user = User.query.filter_by(email=current_user.email).first()
         account = Accounts.query.filter_by(owner=user.id).first()
         balance = account.balance
-        transactions = Transactions.query.filter((Transactions.receiver == account.account_num) | 
-                                                 (Transactions.sender == account.account_num)).order_by(Transactions.date_time.desc()).all()
+        transactions = Transactions.query.filter((Transactions.receiver_account == account) | 
+                                                 (Transactions.sender_account == account)).order_by(Transactions.date_time.desc()).all()
     return render_template('index.html', first_name=first_name, balance=balance, transactions=transactions)

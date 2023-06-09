@@ -8,7 +8,7 @@
         {% for transaction in transactions %}
         <li class="transaction">
             <div class="transaction-date">Date: {{transaction.date_time}}</div>
-            <div class="transaction-parties">From: {{transaction.sender}} To: {{transaction.receiver}} Type: {{transaction.transaction_type_id}}</div>
+            <div class="transaction-parties">From: {{transaction.sender_account.account_owner.first_name}} To: {{transaction.receiver_account.account_owner.first_name}} Type: {{transaction.transaction_type.name}}</div>
             <div class="transaction-amount">Amount: {{transaction.amount}}</div>
         </li>
         {% endfor %}
