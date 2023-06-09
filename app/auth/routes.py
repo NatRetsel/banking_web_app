@@ -27,13 +27,14 @@ def register() -> Response:
         db.session.add(user)
         db.session.commit()
         
-        user_id = User.query.filter_by(email=form.email.data).first().id
-        user_acc = Accounts(owner=user_id)
+        
+        user_acc = Accounts(account_owner=user)
         db.session.add(user_acc)
         db.session.commit()
         
         txn_type = TransactionType.query.filter_by(name="New Account").first()
-        txn = Transactions(receiver=user_acc.account_num, sender=user_acc.account_num, amount=0, date_time=datetime.utcnow(), transaction_type_id=txn_type.id)
+        txn = Transactions(receiver_account=user_acc, sender_account=user_acc, amount=0, date_time=datetime.utcnow(), 
+                           transaction_type=txn_type)
         
         db.session.add(txn)
         db.session.commit()
@@ -94,14 +95,14 @@ def transfer() -> Response:
     form = TransferForm()
     if form.validate_on_submit():
         recipient_acc = Accounts.query.filter_by(account_num=form.recipient_acc_num.data).first()
-        recipient_acc_num = recipient_acc.account_num
+        # recipient_acc_num = recipient_acc.account_num
         sender_acc = Accounts.query.filter_by(owner=current_user.id).first()
-        sender_acc_num = sender_acc.account_num
+        # sender_acc_num = sender_acc.account_num
         recipient_acc.update_balance(form.amount.data)
         sender_acc.update_balance(-form.amount.data)
         
         txn_type = TransactionType.query.filter_by(name="Transfer").first()
-        txn = Transactions(receiver=recipient_acc_num, sender=sender_acc_num, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type_id=txn_type.id)
+        txn = Transactions(receiver_account=recipient_acc, sender_account=sender_acc, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type=txn_type)
         db.session.add_all([recipient_acc, sender_acc, txn])
         db.session.commit()
         return redirect(url_for('main.index'))
@@ -123,7 +124,7 @@ def deposit() -> Response:
         own_account.update_balance(form.amount.data)
         
         txn_type = TransactionType.query.filter_by(name="Deposit").first()
-        txn = Transactions(receiver=own_account.account_num, sender=own_account.account_num, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type_id=txn_type.id)
+        txn = Transactions(receiver_account=own_account, sender_account=own_account, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type=txn_type)
         db.session.add_all([own_account, txn])
         # db.session.add(own_account)
         db.session.commit()

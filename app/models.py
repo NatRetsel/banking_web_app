@@ -63,6 +63,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles_table.id'))
+    accounts = db.relationship("Accounts", backref="account_owner")
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -144,8 +145,8 @@ class Transactions(db.Model):
     __tablename__ = "transactions_table"
     
     id = db.Column(db.Integer, primary_key=True)
-    receiver = db.Column(db.Integer)
-    sender = db.Column(db.Integer)
+    receiver = db.Column(db.Integer, db.ForeignKey("accounts_table.account_num"), nullable=False)
+    sender = db.Column(db.Integer, db.ForeignKey("accounts_table.account_num"), nullable=False)
     amount = db.Column(db.Integer)
     date_time = db.Column(db.DateTime, index=True)
     transaction_type_id = db.Column(db.Integer, db.ForeignKey('transaction_type_table.id'))
@@ -166,9 +167,11 @@ class Accounts(db.Model):
     
     __tablename__ = "accounts_table"
     
-    account_num = db.Column(db.Integer, db.ForeignKey('transactions_table.receiver'), db.ForeignKey('transactions_table.sender'), primary_key=True, autoincrement=True)
+    account_num = db.Column(db.Integer, primary_key=True, autoincrement=True)
     owner = db.Column(db.Integer, db.ForeignKey('users_table.id'))
     balance = db.Column(db.Float, default=0.00)
+    receiver_acc = db.relationship("Transactions", foreign_keys="Transactions.receiver", backref="receiver_account", lazy="dynamic")
+    sender_acc = db.relationship("Transactions", foreign_keys="Transactions.sender", backref="sender_account", lazy="dynamic")
     
     def new_account(self):
         """
