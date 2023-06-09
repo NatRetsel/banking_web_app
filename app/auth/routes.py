@@ -62,7 +62,7 @@ def login() -> Response:
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid email or password')
+            flash('Invalid email or password', 'error')
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -98,14 +98,22 @@ def transfer() -> Response:
         # recipient_acc_num = recipient_acc.account_num
         sender_acc = Accounts.query.filter_by(owner=current_user.id).first()
         # sender_acc_num = sender_acc.account_num
-        recipient_acc.update_balance(form.amount.data)
-        sender_acc.update_balance(-form.amount.data)
-        
-        txn_type = TransactionType.query.filter_by(name="Transfer").first()
-        txn = Transactions(receiver_account=recipient_acc, sender_account=sender_acc, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type=txn_type)
-        db.session.add_all([recipient_acc, sender_acc, txn])
-        db.session.commit()
-        return redirect(url_for('main.index'))
+        if recipient_acc is None:
+            flash('User not found', 'danger')
+            return redirect(url_for('auth.transfer'))
+        elif sender_acc.balance < form.amount.data:
+            flash('Insufficient account balance', 'danger')
+            return redirect(url_for('auth.transfer'))
+        else:
+            recipient_acc.update_balance(form.amount.data)
+            sender_acc.update_balance(-form.amount.data)
+            
+            txn_type = TransactionType.query.filter_by(name="Transfer").first()
+            txn = Transactions(receiver_account=recipient_acc, sender_account=sender_acc, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type=txn_type)
+            db.session.add_all([recipient_acc, sender_acc, txn])
+            db.session.commit()
+            flash('Transfer Success!', 'success')
+            return redirect(url_for('main.index'))
     return render_template('auth/transfer.html', title='Funds Transfer', form=form)
 
 
@@ -128,6 +136,7 @@ def deposit() -> Response:
         db.session.add_all([own_account, txn])
         # db.session.add(own_account)
         db.session.commit()
+        flash('Deposit Success!', 'success')
         return redirect(url_for('main.index'))
     return render_template('auth/deposit.html', title='Deposit', form=form)
         
