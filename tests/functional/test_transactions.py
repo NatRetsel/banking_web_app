@@ -2,7 +2,7 @@ import unittest
 from app import create_app, db
 from app.models import User, Role, Accounts, Transactions, TransactionType
 
-class RegisterLoginTestCase(unittest.TestCase):
+class TransactionsCase(unittest.TestCase):
     
     
     def setUp(self)->None:
