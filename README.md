@@ -1,29 +1,24 @@
 # Banking web app
-## A basic personal banking web app
 
 A personal banking web app supporting user creation, login and showing recent transactions and account balance. Backend written in Flask and SQLite database with Alembic migration support. Frontend written in html and Flask bootstrap. A detailed walkthrough can be found in my medium articles:
 
-- [part one](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-1-8fcc69b80ab2)
-- [part two](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-2-e11ebb4d1703)
-- [part three](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-3-f116e6fa881b)
+* [Part one: <u>Basic app and web forms</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-1-8fcc69b80ab2)
 
-### Folder Contents
-- app 
-  - templates (html files for the different routes in route.py)
-    - base.html
-    - index.html
-    - login.html
-    - register.html
-  - __init__.py 
-  - forms.py (FlaskForm objects for user registration and login)
-  - models.py (database tables as classes)
-  - routes.py (URLs of webapp)
-- migrations (Alembic database migration folder)
-- webapp.py (app initializer script)
-- config.py (configuration settings)
-- .flaskenv
-- data.sqlite
-- requirements.txt
+* [Part two: <u>Database relation and migration</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-2-e11ebb4d1703)
+
+* [Part three: <u>User registration and login</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-3-f116e6fa881b)
+
+* [Part four: <u>Application factory and blueprint</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-4-e9e66769f293) 
+
+* [Part five: <u>Unit and Functional tests</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-4-e9e66769f293)
+
+* [Part six: <u>Transactions</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-6-ca3d14473c59)
+
+### Features
+Users are able to register an account, deposit funds and transfer to existing accounts in the database. Users can view their account details and transactions in the index page.
+![Register page](/screenshots/register.png "Register page")
+![Login page](/screenshots/login.png "Login page")
+![Index page](/screenshots/index_logged_in.png "Index page")
 
 ### To run: 
 - pip install -r requirements.txt in virtual environment
@@ -32,58 +27,7 @@ A personal banking web app supporting user creation, login and showing recent tr
   - Testing: 'testing'
   - Production: 'production'
   - Default: Development
-- flask run
+- In the command line: flask run
 
 ### SQLite Database
-- Tables
-  - Roles (one to many relation to User table)
-    - id (primary key)
-    - role
-  - User 
-    - id (primary key)
-    - first name
-    - last name
-    - email
-    - password hash
-    - role_id (foreign key to Roles table)
-    - balance
-    - txns (foreign key to Transactions table)
-  - Transactions
-    - id (primary key)
-    - txn_to (receiver)
-    - txn_from (sender)
-    - date
-
-- Initialize role id accordingly:
-  - 'Admin', id 1
-  - 'Moderator', id 2
-  - 'User', id 3
-
-
-## Roadmap
-
-#### 1.) User login creation, local database storage with SQLite
-  - User registration (done)
-  - User login (done)
-  - User data (done):
-    - Email
-    - Password hash
-    - First name
-    - Last name
-  - Relational data (TBD):
-    - Roles (admin, user etc) (Done) 
-    - Transactions (WIP relating foreign key to User table)
-  
-#### 2.) Unit testing for part 1 (WIP)
-  - Setup
-  - teardown 
-  - if app exist
-  - if configuration == config['testing']
-  - default role id is "user" upon new registration
-
-#### 3.) Refactor with application factory and blueprint
-
-#### 4.) Email support with Flask-Mail
-
-#### 5.) User Transaction details
-
+![Database relational figure](/screenshots/Untitled%20(7).png "Database relational figure")
