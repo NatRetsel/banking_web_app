@@ -53,8 +53,6 @@ def login() -> Response:
         (ii) if user does not exist or password is wrong
             - flask error message and redirects to login page
 
-    Returns:
-        Response: _description_
     """
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
@@ -120,10 +118,11 @@ def transfer() -> Response:
 @auth.route('/deposit',  methods=['GET', 'POST'])
 @login_required
 def deposit() -> Response:
-    """_summary_
-
+    """Deposit function mimicking cash deposit feature
+        - Upon form validation, adds amount into user account balance, creates a corresponding transaction
+        and pushes into database
     Returns:
-        Response: _description_
+        Response: main.index.html if successful else auth/deposit.html
     """
     form = DepositForm()
     if form.validate_on_submit():
@@ -134,7 +133,7 @@ def deposit() -> Response:
         txn_type = TransactionType.query.filter_by(name="Deposit").first()
         txn = Transactions(receiver_account=own_account, sender_account=own_account, amount=form.amount.data, date_time=datetime.utcnow(), transaction_type=txn_type)
         db.session.add_all([own_account, txn])
-        # db.session.add(own_account)
+        
         db.session.commit()
         flash('Deposit Success!', 'success')
         return redirect(url_for('main.index'))

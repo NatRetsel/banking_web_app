@@ -8,7 +8,12 @@ from . import main
 @main.route('/index')
 def index() -> Response:
     """Index / Home route for the app. 
-    Displays user's first name if logged in by retrieving it from the session, else None
+    If user is logged in:
+        - queries for
+            -user's first name
+            -user's account
+            -user's transaction
+    
     Returns:
         Response: index.html
     """

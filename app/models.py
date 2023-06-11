@@ -71,7 +71,12 @@ class User(UserMixin, db.Model):
             self.role = Role.query.filter_by(default=True).first()
     
     @property
-    def pasword(self):
+    def password(self):
+        """Raises AttributeError when password is queried for
+
+        Raises:
+            AttributeError: password is not a readable attribute
+        """
         raise AttributeError('password is not a readable attribute')
     
     def set_password(self, password: str) -> None:
@@ -134,11 +139,12 @@ class Transactions(db.Model):
     """Transactions SQlite ORM model
 
     Columns:
-        - id (SQLite bigint): primary key
-        - receiver (SQLite bigint): account number of receiver
-        - sender (SQLite bigint): account number of sender
-        - amount (SQLite bigint): amount involved in the transaction
+        - id (SQLite int): primary key
+        - receiver (SQLite int): account number of receiver
+        - sender (SQLite int): account number of sender
+        - amount (SQLite int): amount involved in the transaction
         - date_time (SQLite DateTime): date time of the transaction
+        - transaction_type_id (SQLite int): id corresponding to the transaction types (e.g. Deposits, Transfer)
     
     """
     
@@ -159,9 +165,9 @@ class Accounts(db.Model):
     """Bank account SQlite ORM model
 
     Columns:
-        account_num (SQLite bigint): bank account number
+        account_num (SQLite int): bank account number
         owner (SQLite int): bank account owner, mapped to users_table id
-        balance (SQLite bigint): account balance
+        balance (SQLite int): account balance, default 0 during account creation
     """
     
     __tablename__ = "accounts_table"
@@ -180,6 +186,11 @@ class Accounts(db.Model):
             self.balance = 0
     
     def update_balance(self, amount):
+        """Updates Account balance
+
+        Args:
+            amount (int): update amount. Negative for fund removal.
+        """
         self.balance += amount
     
     def __repr__(self):

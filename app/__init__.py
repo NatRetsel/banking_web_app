@@ -29,6 +29,7 @@ db = SQLAlchemy(metadata=metadata)
 
 
 def create_app(config_name):
+    # Application factory
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
