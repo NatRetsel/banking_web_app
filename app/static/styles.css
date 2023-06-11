@@ -1,0 +1,27 @@
+h1 {
+    margin: 25px 300px;
+    width: 350px;
+    height: 75px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.account, .balance {
+    margin: 10px 375px;
+    justify-content: center;
+}
+.transactions{
+    margin: auto;
+}
+.transaction {
+    margin: auto;
+    width: 350px;
+    height: 75px;
+    display: flex;
+    
+}
+.transaction-parties{
+    margin: auto;
+    height: 85px;
+    text-align: left;
+}

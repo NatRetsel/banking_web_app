@@ -1,21 +1,38 @@
 {% extends "base.html" %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+{% endblock %}
+
 {% block content %}
     <h1>Hello {{current_user.first_name}}</h1>
     {% if current_user.is_authenticated %}
-        <div>Account No. {{account.account_num}}</div>
-        <div>Balance: {{ balance }} </div>
+        <div class="account">Account No. {{account.account_num}}</div>
+        <div class="balance">Balance: {{ balance }} </div>
     {% endif %}
     <ul class="transactions">
+        
         {% for transaction in transactions %}
+        
+        
         <li class="transaction">
-            <div class="transaction-date">Date: {{transaction.date_time}}</div>
-            <div class="transaction-parties">From: {{transaction.sender_account.account_owner.first_name}} To: {{transaction.receiver_account.account_owner.first_name}} Type: {{transaction.transaction_type.name}}</div>
-            {% if transaction.transaction_type.name == "Transfer" and transaction.sender_account == account %}
-                <div class="transaction-amount">Amount: -{{transaction.amount}}</div>
+            <div class="transaction-date"> {{transaction.date_time.strftime('%Y-%m-%d')}} </div> <br />&nbsp;
+            
+            {% if transaction.transaction_type.name == "New Account" or transaction.transaction_type.name == "Deposit" %}
+                <div class="transaction-parties"> {{transaction.transaction_type.name}} </div>
             {% else %}
-                <div class="transaction-amount">Amount: {{transaction.amount}}</div>
+                <div class="transaction-parties"> {{transaction.receiver_account.account_owner.first_name}} - {{transaction.transaction_type.name}}</div>
+                
+            {% endif %}
+    
+            {% if transaction.transaction_type.name == "Transfer" and transaction.sender_account == account %}
+                <div class="transaction-amount">-{{transaction.amount}}</div>
+            {% else %}
+                <div class="transaction-amount">{{transaction.amount}}</div>
             {% endif %}
         </li>
         {% endfor %}
+        
     </ul>
 {% endblock %}
