@@ -18,7 +18,7 @@ A personal banking web app supporting user creation, login and showing recent tr
 Users are able to register an account, deposit funds and transfer to existing accounts in the database. Users can view their account details and transactions in the index page.
 ![Register page](/screenshots/register.png "Register page")
 ![Login page](/screenshots/login.png "Login page")
-![Index page](/screenshots/index_logged_in.png "Index page")
+![Index page](/screenshots/index_logged_in_v2.png "Index page")
 
 ### To run: 
 - pip install -r requirements.txt in virtual environment

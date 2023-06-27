@@ -70,4 +70,25 @@ class DepositForm(FlaskForm):
     """
     amount = FloatField('Amount', validators=[DataRequired(), NumberRange(min=0.01)])
     submit = SubmitField('Send')
+
+
+class UpdateEmailForm(FlaskForm):
+    """User update email form
+        - Context: Allowing logged in users to change their email
     
+    """
+    new_email = EmailField('New Email',validators=[DataRequired(), Email()])
+    new_email_2 = EmailField('Repeat New Email',validators=[DataRequired(), Email(), EqualTo('new_email')] )
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Update')
+
+
+class UpdatePasswordForm(FlaskForm):
+    """User update password form
+        - Context: Allowing logged in users to change their password
+    
+    """
+    old_password = PasswordField('Old Password', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired()])
+    new_password_2 = PasswordField('Repeat New Password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Update')
