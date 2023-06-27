@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for, flash, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
-from ..main.forms import RegistrationForm, LoginForm, TransferForm, DepositForm
+from ..main.forms import RegistrationForm, LoginForm, TransferForm, DepositForm, UpdateEmailForm, UpdatePasswordForm
 from app.models import User, Role, Accounts, Transactions, TransactionType
 from datetime import datetime
 from .. import db
@@ -138,4 +138,57 @@ def deposit() -> Response:
         flash('Deposit Success!', 'success')
         return redirect(url_for('main.index'))
     return render_template('auth/deposit.html', title='Deposit', form=form)
+
+
+@auth.route('/update', methods=['GET', 'POST'])
+@login_required
+def update() -> Response:
+    """Update function for users to change email address
+        - Requires users to be logged in
+        - Upon form validation:
+            i. Queries to check if new email has been taken, if yes, flash corresponding message and reloads page
+            ii. If new email is free for grabs, query for current_user, update email and push to database
+
+    Returns:
+        Response: update.html if GET or unsuccessful update else index.html
+    """
+    form = UpdateEmailForm()
+    if form.validate_on_submit():
+        existing_user = User.query.filter_by(email=form.new_email.data).first()
+        if existing_user is None:
+            acc_owner = User.query.filter_by(email=current_user.email).update(dict(email=form.new_email.data))
+            db.session.commit()
+            flash('Email changed successful!', 'success')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Please choose another email address', 'info')
+    return render_template('auth/update.html', title='Update Email', form=form)
+
+
+@auth.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password() -> Response:
+    """Change user password
+        - Requires users to be logged in
+        - Upon form validation:
+            i. Queries for user row in database from current_user. Makes sure password is correct
+            ii. Updates password hash if password is correct else refresh page
+    
+    Returns:
+        Response: update.html if GET or unsuccessful change else index.html   
+    """
+    form = UpdatePasswordForm()
+    if form.validate_on_submit():
+        acc_owner = User.query.filter_by(email=current_user.email).first()
+        if acc_owner.check_password(form.old_password.data):
+            if acc_owner.check_password(form.new_password.data):
+                flash('Please enter a password different from the previous one', 'info')
+                return redirect(url_for('auth.change_password'))
+            acc_owner.set_password(form.new_password.data)
+            db.session.commit()
+            flash('Password changed successful!', 'success')
+            return redirect(url_for('main.index'))
+        else:
+            flash('Incorrect password entered', 'info')
+    return render_template('auth/update.html', title='Change Password', form=form)         
         
