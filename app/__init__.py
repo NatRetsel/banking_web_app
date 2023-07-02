@@ -39,11 +39,17 @@ def create_app(config_name):
     login.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
     
+    from app.api import api as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+    
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
     
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    
+    from .errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
     
     return app
     

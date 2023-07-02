@@ -1,7 +1,11 @@
 from app import db, login
+from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from . import login
+import base64
+from datetime import datetime, timedelta
+import os
 
 @login.user_loader
 def load_user(id):
@@ -64,6 +68,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles_table.id'))
     accounts = db.relationship("Accounts", backref="account_owner")
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
+    
     
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -99,6 +106,53 @@ class User(UserMixin, db.Model):
             bool: True if the input password matches the one stored in database as a hashed value.
         """
         return check_password_hash(self.password_hash, password)
+    
+    
+    def get_token(self, expires_in=3600):
+        now = datetime.utcnow()
+        if self.token and self.token_expiration > now + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
+    
+    
+    def revoke_token(self):
+        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+        
+    
+    @staticmethod
+    def check_token(token):
+        user = User.query.filter_by(token=token).first()
+        if user is None or user.token_expiration < datetime.utcnow():
+            return None
+        return user
+    
+    
+    def to_dict(self):
+        data = {
+                "id": self.id,
+                "first_name": self.first_name,
+                "last_name": self.last_name,
+                "email": self.email,
+                "accounts": url_for('api.get_accounts', id=self.id),
+                "transactions":url_for('api.get_user_transactions', id=self.id)
+        }
+        return data
+    
+    
+    def from_dict(self, data, new_user=False, update_email=False, change_password=False):
+        if new_user and 'password' in data:
+            for field in ['first_name', 'last_name', 'email']:
+                if field in data:
+                    setattr(self, field, data[field])
+            self.set_password(data["password"])
+        elif update_email and 'new_email' in data:
+            setattr(self, "email", data["new_email"])
+        elif change_password and 'new_password' in data:
+            self.set_password(data["new_password"])
+            
 
     def __repr__(self):
         return '<User {} {}>'.format(self.first_name, self.last_name)
@@ -157,6 +211,38 @@ class Transactions(db.Model):
     date_time = db.Column(db.DateTime, index=True)
     transaction_type_id = db.Column(db.Integer, db.ForeignKey('transaction_type_table.id'))
     
+    def to_dict(self):
+        data = {
+                "id": self.id,
+                "from": self.sender_account.account_owner.first_name + " " + self.sender_account.account_owner.last_name,
+                "from_acc": self.sender,
+                "to": self.receiver_account.account_owner.first_name + " " + self.receiver_account.account_owner.last_name,
+                "to_acc": self.receiver,
+                "amount": self.amount,
+                "type": self.transaction_type.name
+        }
+        return data
+    
+    @staticmethod
+    def to_collection_dict(user):
+        account = Accounts.query.filter_by(account_owner=user).all()
+        txns = []
+        for acc in account:
+            transactions = Transactions.query.filter((Transactions.receiver_account == acc) | 
+                                                 (Transactions.sender_account == acc)).order_by(Transactions.date_time.desc()).all()
+            for txn in transactions:
+                txns.append(txn.to_dict())
+        
+        data = {
+            "transactions": txns,
+            "_meta": {
+                'total_transactions':len(txns)
+            }
+        }
+        return data
+    
+    
+    
     def __repr__(self):
         return '< {} Txn {}: {} - {}, amount {}, type: {}>'.format(self.date_time, self.id, self.sender, self.receiver, self.amount, self.transaction_type_id)
 
@@ -192,6 +278,31 @@ class Accounts(db.Model):
             amount (int): update amount. Negative for fund removal.
         """
         self.balance += amount
+    
+    
+    def to_dict(self):
+        data = {
+                "account_num": self.account_num,
+                "owner": self.owner,
+                "balance": self.balance
+        }
+        return data
+    
+    @staticmethod
+    def to_collection_dict(user):
+        total = 0
+        accounts = Accounts.query.filter_by(account_owner=user).all()
+        for item in accounts:
+            total += item.balance
+        data = {
+            "accounts": [item.to_dict() for item in accounts],
+            "_meta": {
+                'num_accounts':len(accounts),
+                'total_balance': total
+            }
+        }
+        return data
+    
     
     def __repr__(self):
         return '<Account no. {}, owner {}: {}>'.format(self.owner, self.account_num, self.balance)

@@ -14,6 +14,10 @@ A personal banking web app supporting user creation, login and showing recent tr
 
 * [Part six: <u>Transactions</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-6-ca3d14473c59)
 
+* [Part seven: <u>Updating User Information</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-7-92edd149fc35)
+
+* [Part eight: <u>REST API</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-8-fa886a921434)
+
 ### Features
 Users are able to register an account, deposit funds and transfer to existing accounts in the database. Users can view their account details and transactions in the index page.
 ![Register page](/screenshots/register.png "Register page")
@@ -31,3 +35,6 @@ Users are able to register an account, deposit funds and transfer to existing ac
 
 ### SQLite Database
 ![Database relational figure](/screenshots/Untitled%20(7).png "Database relational figure")
+
+### REST API endpoints
+![REST API endpoints](/screenshots/rest_routes.png "Table containing REST API endpoints")
