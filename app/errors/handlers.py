@@ -18,7 +18,7 @@ def not_found_error(error):
 
 @bp.app_errorhandler(500)
 def internal_error(error):
-    db.session.rollbacl()
+    db.session.rollback()
     if wants_json_response():
         return api_error_response(500)
     return render_template('500.html'), 500

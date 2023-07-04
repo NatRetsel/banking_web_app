@@ -1,6 +1,6 @@
 import unittest
 from app import create_app, db
-from app.models import User, Role
+from app.models import User, Role, TransactionType
 
 class RegisterLoginTestCase(unittest.TestCase):
     def setUp(self)->None:
@@ -14,6 +14,7 @@ class RegisterLoginTestCase(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         Role.insert_roles()
+        TransactionType.insert_transaction_types()
         self.client = self.app.test_client(use_cookies=True)
     
     def tearDown(self) -> None:

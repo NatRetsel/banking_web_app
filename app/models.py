@@ -109,6 +109,7 @@ class User(UserMixin, db.Model):
     
     
     def get_token(self, expires_in=3600):
+        # Retrieves token from user role in database if it hasn't expires else create a new one
         now = datetime.utcnow()
         if self.token and self.token_expiration > now + timedelta(seconds=60):
             return self.token
@@ -119,11 +120,13 @@ class User(UserMixin, db.Model):
     
     
     def revoke_token(self):
+        # Allowing users to revoke tokens
         self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
         
     
     @staticmethod
     def check_token(token):
+        # Function to check if token has expired
         user = User.query.filter_by(token=token).first()
         if user is None or user.token_expiration < datetime.utcnow():
             return None
@@ -131,6 +134,7 @@ class User(UserMixin, db.Model):
     
     
     def to_dict(self):
+        # Pieces information to a Python dictionary
         data = {
                 "id": self.id,
                 "first_name": self.first_name,
@@ -143,6 +147,7 @@ class User(UserMixin, db.Model):
     
     
     def from_dict(self, data, new_user=False, update_email=False, change_password=False):
+        # Converts parsed JSON to a Python dictionary
         if new_user and 'password' in data:
             for field in ['first_name', 'last_name', 'email']:
                 if field in data:
@@ -212,6 +217,7 @@ class Transactions(db.Model):
     transaction_type_id = db.Column(db.Integer, db.ForeignKey('transaction_type_table.id'))
     
     def to_dict(self):
+        # Pieces transaction information to a Python dictionary
         data = {
                 "id": self.id,
                 "from": self.sender_account.account_owner.first_name + " " + self.sender_account.account_owner.last_name,
@@ -225,6 +231,8 @@ class Transactions(db.Model):
     
     @staticmethod
     def to_collection_dict(user):
+        # Pieces all transactions involving user into a Python dictionary
+        # Added the possibility to query for multiple accounts
         account = Accounts.query.filter_by(account_owner=user).all()
         txns = []
         for acc in account:
@@ -281,6 +289,7 @@ class Accounts(db.Model):
     
     
     def to_dict(self):
+        # Pieces account information to a Python dictionary
         data = {
                 "account_num": self.account_num,
                 "owner": self.owner,
@@ -290,6 +299,7 @@ class Accounts(db.Model):
     
     @staticmethod
     def to_collection_dict(user):
+        # Pieces all accounts belonging to user into a Python dictionary
         total = 0
         accounts = Accounts.query.filter_by(account_owner=user).all()
         for item in accounts:
