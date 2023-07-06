@@ -19,9 +19,17 @@ A personal banking web app supporting user creation, login and showing recent tr
 * [Part eight: <u>REST API</u>](https://medium.com/@sunsethorizonstories/banking-web-app-stories-part-8-fa886a921434)
 
 ### Features
-Users are able to register an account, deposit funds and transfer to existing accounts in the database. Users can view their account details and transactions in the index page.
+Users are able to register a user account together with a bank account, deposit funds and transfer to existing bank accounts in the database. Users can view their bank account details and transactions in the index page.
+
+Note: 
+* For the scope of this project, we assumed one bank account per user account. However, some APIs are configured for the scenario where each user can have multiple bank accounts. This leaves an option for added features in the future.
+* This project also assumes that users can and will only transaction between users of the same bank. A possible feature in the future would be to include which bank the user's account is registered under in the Accounts table to mimic and keep track of inter-bank transactions.
+
+#### Registration
 ![Register page](/screenshots/register.png "Register page")
+#### Login
 ![Login page](/screenshots/login.png "Login page")
+#### Logged in index page
 ![Index page](/screenshots/index_logged_in_v2.png "Index page")
 
 ### To run: 
@@ -34,7 +42,7 @@ Users are able to register an account, deposit funds and transfer to existing ac
 - In the command line: flask run
 
 ### SQLite Database
-![Database relational figure](/screenshots/Untitled%20(7).png "Database relational figure")
+![Database relational figure](/screenshots/banking_web_app_db_diagram.png "Database relational figure")
 
 ### REST API endpoints
 ![REST API endpoints](/screenshots/rest_routes.png "Table containing REST API endpoints")

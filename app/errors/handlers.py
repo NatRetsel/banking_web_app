@@ -3,7 +3,7 @@ from app import db
 from app.errors import bp
 from app.api.errors import error_response as api_error_response
 
-
+# Modifying global application error handlers with wants_json_response so content negotiation can be used to reply in HTML or JSON 
 def wants_json_response():
     return request.accept_mimetypes['application/json'] >= \
         request.accept_mimetypes['text/html']
